@@ -23,6 +23,9 @@ class ViewController: UIViewController {
     var counter: Int = 0
 
     let photos: [String] = ["michaelImage", "longMichael"]
+    var degrees: Double = 0
+    var imageTopConstraing: Constraint?
+    var imageCenterConstraing: Constraint?
     
 
     override func viewDidLoad() {
@@ -37,6 +40,8 @@ class ViewController: UIViewController {
         makeDivButton()
         makeZeroValueButton()
         makeSwither()
+        makeGestureForImage()
+        makeSwipeForImage()
     }
     
     func makeImageView() {
@@ -47,8 +52,8 @@ class ViewController: UIViewController {
         imageView.backgroundColor = .black
         view.addSubview(imageView)
         imageView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(64)
-            make.centerX.equalToSuperview()
+            self.imageTopConstraing = make.top.equalToSuperview().offset(64).constraint
+            self.imageCenterConstraing = make.centerX.equalToSuperview().constraint
             make.width.equalTo(100)
             make.height.equalTo(120)
             
@@ -202,6 +207,73 @@ class ViewController: UIViewController {
         imageView.image = UIImage(named: photoName)
     }
 
+}
+
+extension ViewController {
+    func makeGestureForImage() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction))
+        imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(tap)
+    }
+
+    @objc
+    func tapAction() {
+        imageView.transform = imageView.transform.rotated(by: .pi / 2)
+    }
+
+    func makeSwipeForImage() {
+        let swipeDown = UISwipeGestureRecognizer(
+            target: self,
+            action: #selector(swipeDownAction)
+        )
+
+        swipeDown.direction = .down
+        imageView.addGestureRecognizer(swipeDown)
+
+        let swipeUIUp = UISwipeGestureRecognizer(
+            target: self,
+            action: #selector(swipeUpAction)
+        )
+        
+        swipeUIUp.direction = .up
+        imageView.addGestureRecognizer(swipeUIUp)
+
+        let swipeLeft = UISwipeGestureRecognizer(
+            target: self,
+            action: #selector(swipeLeftAction)
+        )
+        
+        swipeLeft.direction = .left
+        imageView.addGestureRecognizer(swipeLeft)
+        
+        let rightSwipe = UISwipeGestureRecognizer(
+            target: self,
+            action: #selector(swipeRightAction)
+        )
+        
+        rightSwipe.direction = .right
+        imageView.addGestureRecognizer(rightSwipe)
+    }
+
+    @objc
+    func swipeDownAction() {
+        imageTopConstraing?.update(offset: 128)
+    }
+
+    @objc
+    func swipeUpAction() {
+        imageTopConstraing?.update(offset: 64)
+    }
+
+    @objc
+    func swipeLeftAction() {
+        imageCenterConstraing?.update(offset: -64)
+    }
+
+    @objc
+    func swipeRightAction() {
+        imageCenterConstraing?.update(offset: 64)
+    }
 }
 #Preview {
     ViewController()
